@@ -38,7 +38,7 @@ export default function Product() {
         <button className="btn w-full" onClick={act} disabled={busy}>
           {free || owned ? <><Download className="h-4 w-4" />{busy ? 'Preparing…' : 'Download'}</> : <><ShoppingCart className="h-4 w-4" />{busy ? 'Redirecting…' : user ? 'Buy now' : 'Sign in to buy'}</>}</button>
         {owned && <p className="text-xs text-emerald-400">You own this product.</p>}
-        <dl className="divide-y divide-line text-sm">{rows.map(([k, v]) => <div key={k} className="flex justify-between py-2"><dt className="text-mute">{k}</dt><dd>{v}</dd></div>)}</dl>
+        <dl className="divide-y divide-line text-sm">{rows.map(([k, v]) => <div key={k} className="flex justify-between py-2"><dt className="text-mute">{k}</dt><dd className="mono-data">{v}</dd></div>)}</dl>
       </aside>
     </div>)
 }
