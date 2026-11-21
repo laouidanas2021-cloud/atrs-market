@@ -10,12 +10,12 @@ async function addFile(pid: string, file: File, version: string) {
   const { error } = await supabase.from('product_files').insert({ product_id: pid, path, version, size_bytes: file.size, is_current: true }); if (error) throw error
   await supabase.from('products').update({ version, file_size_bytes: file.size }).eq('id', pid)
 }
-const TABS = ['Overview', 'Products', 'Categories', 'Orders', 'Files']
+const TABS = ['Overview', 'Products', 'Categories', 'Orders', 'Users', 'Files']
 export default function Admin() {
   const [tab, setTab] = useState('Overview')
   return (<div><h1 className="mb-4 text-2xl font-semibold">Admin</h1>
     <div className="mb-6 flex gap-2 overflow-x-auto border-b border-line pb-3">{TABS.map(t => <button key={t} onClick={() => setTab(t)} className={`rounded-lg px-3 py-1.5 text-sm ${tab === t ? 'bg-accent text-white' : 'text-mute hover:text-ink'}`}>{t}</button>)}</div>
-    {tab === 'Overview' && <Overview />}{tab === 'Products' && <Products />}{tab === 'Categories' && <Categories />}{tab === 'Orders' && <Orders />}{tab === 'Files' && <Files />}</div>)
+    {tab === 'Overview' && <Overview />}{tab === 'Products' && <Products />}{tab === 'Categories' && <Categories />}{tab === 'Orders' && <Orders />}{tab === 'Users' && <Users />}{tab === 'Files' && <Files />}</div>)
 }
 function Overview() {
   const [s, setS] = useState<any>(null); const [r, setR] = useState<any[]>([])
@@ -104,6 +104,24 @@ function Orders() {
     {!list.length && <tr><td className="p-4 text-mute" colSpan={6}>No orders yet.</td></tr>}
     {list.map(o => <tr key={o.id}><td className="p-3">{o.profiles?.full_name || '—'}<div className="text-xs text-mute">{o.profiles?.email}</div></td><td>{o.products?.name}</td><td>{money(o.amount_cents, o.currency)}</td><td>{o.status}</td><td>{new Date(o.created_at).toLocaleDateString()}</td><td><button className="btn-ghost" onClick={() => setOpen(o)}>Details</button></td></tr>)}</tbody></table></div>
     {open && <pre className="card mt-4 overflow-x-auto p-4 text-xs text-mute">{JSON.stringify(open, null, 2)}</pre>}</div>)
+}
+function Users() {
+  const [list, setList] = useState<any[]>([]), [loading, setLoading] = useState(true), [q, setQ] = useState('')
+  useEffect(() => { supabase.rpc('admin_list_users').then(r => { setList(r.data || []); setLoading(false) }) }, [])
+  const rows = list.filter(u => !q || (u.email || '').toLowerCase().includes(q.toLowerCase()) || (u.full_name || '').toLowerCase().includes(q.toLowerCase()))
+  return (<div>
+    <div className="mb-4 flex items-center justify-between gap-3">
+      <input className="input max-w-xs" placeholder="Search by email or name" value={q} onChange={e => setQ(e.target.value)} />
+      <span className="text-sm text-mute">{list.length} registered user{list.length === 1 ? '' : 's'}</span>
+    </div>
+    <div className="card overflow-x-auto"><table className="w-full text-left text-sm"><thead className="text-xs text-mute"><tr><th className="p-3">Email</th><th>Name</th><th>Role</th><th>Orders</th><th>Joined</th><th>Last login</th></tr></thead><tbody className="divide-y divide-line">
+      {loading && <tr><td className="p-4 text-mute" colSpan={6}>Loading…</td></tr>}
+      {!loading && !rows.length && <tr><td className="p-4 text-mute" colSpan={6}>No users found.</td></tr>}
+      {rows.map(u => <tr key={u.id}><td className="p-3">{u.email}</td><td>{u.full_name || '—'}</td>
+        <td>{u.is_admin ? <span className="rounded bg-accent/20 px-2 py-0.5 text-xs text-accent">Admin</span> : 'Customer'}</td>
+        <td>{u.purchase_count}</td><td>{new Date(u.created_at).toLocaleDateString()}</td>
+        <td>{u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : 'Never'}</td></tr>)}
+    </tbody></table></div></div>)
 }
 function Files() {
   const [list, setList] = useState<any[]>([])
