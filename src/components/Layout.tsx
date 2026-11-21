@@ -81,12 +81,16 @@ export default function Layout() {
   const sideW = collapsed ? COLLAPSED_W : width
   return (
     <div className="min-h-screen md:flex">
-      <aside className="relative hidden shrink-0 border-r border-line bg-panel md:block" style={{ width: sideW, transition: dragging.current ? 'none' : 'width 150ms' }}>
+      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0 opacity-70" style={{ backgroundImage: 'radial-gradient(rgb(var(--c-line)) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <span className="absolute -bottom-12 -right-6 select-none whitespace-nowrap font-mono text-[34vw] font-bold leading-none tracking-tighter text-ink/5 sm:text-[26vw] lg:text-[18vw]">ATR</span>
+      </div>
+      <aside className="relative z-10 hidden shrink-0 border-r border-line bg-panel md:block" style={{ width: sideW, transition: dragging.current ? 'none' : 'width 150ms' }}>
         <div className="sticky top-0 h-screen overflow-y-auto"><SidebarBody collapsed={collapsed} onToggleCollapse={() => setCollapsed(c => !c)} /></div>
         {!collapsed && <div onPointerDown={e => { dragging.current = true; document.body.style.userSelect = 'none'; (e.target as HTMLElement).setPointerCapture(e.pointerId) }}
           className="absolute inset-y-0 right-0 w-1 cursor-col-resize hover:bg-accent/40" title="Drag to resize sidebar" />}
       </aside>
-      <header className="flex items-center justify-between border-b border-line bg-panel px-4 py-3 md:hidden">
+      <header className="relative z-10 flex items-center justify-between border-b border-line bg-panel px-4 py-3 md:hidden">
         <Link to="/" className="flex items-center gap-2.5 font-semibold tracking-tight"><Mark />ATR'S MARKET</Link>
         <button aria-label="Open menu" onClick={() => setOpen(true)} className="rounded-md p-2 text-mute hover:bg-panel2 hover:text-ink"><Menu className="h-5 w-5" /></button>
       </header>
@@ -98,7 +102,7 @@ export default function Layout() {
             <SidebarBody collapsed={false} onToggleCollapse={() => {}} onNavigate={() => setOpen(false)} />
           </div>
         </div>)}
-      <div className="flex min-h-screen flex-1 flex-col">
+      <div className="relative z-10 flex min-h-screen flex-1 flex-col">
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 md:px-8">
           <Outlet />
         </main>
