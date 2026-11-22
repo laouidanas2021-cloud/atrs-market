@@ -17,13 +17,14 @@ Deno.serve(async (req) => {
   const { error: dup } = await db.from("webhook_events").insert({ id: ev.event_id, type: ev.event_type }); // duplicate protection
   if (dup) return new Response("Already processed", { status: 200 });
   try {
-    const pid = d.custom_data?.purchase_id;
-    if (ev.event_type === "transaction.completed" && pid) {
-      await db.from("purchases").update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", pid).eq("paddle_txn_id", d.id).in("status", ["pending", "failed"]);
-    } else if (ev.event_type === "transaction.payment_failed" && pid) {
-      await db.from("purchases").update({ status: "failed" }).eq("id", pid).eq("paddle_txn_id", d.id).eq("status", "pending");
+    const custom = d.custom_data ?? {}; const id = custom.purchase_id; const table = custom.kind === "donation" ? "donations" : "purchases";
+    if (ev.event_type === "transaction.completed" && id) {
+      await db.from(table).update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", id).eq("paddle_txn_id", d.id).in("status", ["pending", "failed"]);
+    } else if (ev.event_type === "transaction.payment_failed" && id) {
+      await db.from(table).update({ status: "failed" }).eq("id", id).eq("paddle_txn_id", d.id).eq("status", "pending");
     } else if ((ev.event_type === "adjustment.created" || ev.event_type === "adjustment.updated") && d.status === "approved" && (d.action === "refund" || d.action === "chargeback")) {
       await db.from("purchases").update({ status: "refunded" }).eq("paddle_txn_id", d.transaction_id);
+      await db.from("donations").update({ status: "refunded" }).eq("paddle_txn_id", d.transaction_id);
     }
   } catch {
     await db.from("webhook_events").delete().eq("id", ev.event_id); // let Paddle retry

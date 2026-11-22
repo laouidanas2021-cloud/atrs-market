@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
           description: p.name.slice(0, 200), name: p.name.slice(0, 100),
           unit_price: { amount: String(p.price_cents), currency_code: p.currency.toUpperCase() },
           product: { name: p.name.slice(0, 200), tax_category: "standard" } } }],
-        custom_data: { purchase_id: purchaseId, user_id: user.id, product_id: p.id },
+        custom_data: { kind: "purchase", purchase_id: purchaseId, user_id: user.id, product_id: p.id },
       }),
     });
     const t = await r.json();

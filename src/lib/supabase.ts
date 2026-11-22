@@ -14,3 +14,12 @@ async function fn(name: string, productId: string) {
 }
 export const download = (id: string) => fn('get-download-url', id)
 export const checkout = (id: string) => fn('create-checkout', id)
+export async function donate(amountCents: number, message: string) {
+  const { data, error } = await supabase.functions.invoke('create-donation', { body: { amountCents, message } })
+  if (error || !data?.url) {
+    let m = 'Something went wrong. Please try again.'
+    try { m = (await (error as any).context.json()).error || m } catch {}
+    alert(m); return
+  }
+  window.location.href = data.url
+}

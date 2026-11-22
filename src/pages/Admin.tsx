@@ -21,7 +21,7 @@ function Overview() {
   const [s, setS] = useState<any>(null); const [r, setR] = useState<any[]>([])
   useEffect(() => { supabase.rpc('admin_stats').then(x => setS(x.data)); supabase.from('purchases').select('*,products(name)').order('created_at', { ascending: false }).limit(8).then(x => setR(x.data || [])) }, [])
   if (!s) return <p className="text-mute">Loading…</p>
-  const cards: [string, string][] = [['Products', s.products], ['Users', s.users], ['Paid orders', s.purchases], ['Downloads', s.downloads], ['Revenue', money(s.revenue_cents)]]
+  const cards: [string, string][] = [['Products', s.products], ['Users', s.users], ['Paid orders', s.purchases], ['Downloads', s.downloads], ['Revenue', money(s.revenue_cents)], ['Donations', `${money(s.donations_cents || 0)} (${s.donations_count || 0})`]]
   return (<div className="space-y-6"><div className="grid grid-cols-2 gap-4 lg:grid-cols-5">{cards.map(([k, v]) => <div key={k} className="card p-4"><p className="text-xs text-mute">{k}</p><p className="mt-1 text-2xl font-semibold">{v}</p></div>)}</div>
     <div><h2 className="mb-2 font-medium">Recent activity</h2><div className="card divide-y divide-line text-sm">{!r.length && <p className="p-3 text-mute">No orders yet.</p>}{r.map(o => <div key={o.id} className="flex justify-between p-3"><span>{o.products?.name}</span><span className="text-mute">{money(o.amount_cents, o.currency)} · {o.status} · {new Date(o.created_at).toLocaleString()}</span></div>)}</div></div></div>)
 }

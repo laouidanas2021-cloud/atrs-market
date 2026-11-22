@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { ChevronsLeft, ChevronsRight, Compass, LayoutGrid, LibraryBig, LogOut, Menu, Moon, Search, ShieldCheck, Sun, X } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight, Compass, Heart, LayoutGrid, LibraryBig, LogOut, Menu, Moon, Search, ShieldCheck, Sun, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
@@ -16,6 +16,7 @@ function NavLinks({ isAdmin, collapsed, onNavigate }: { isAdmin: boolean; collap
     { to: '/', label: 'Home', icon: LayoutGrid, exact: true },
     { to: '/explore', label: 'Explore', icon: Compass },
     { to: '/library', label: 'Library', icon: LibraryBig },
+    { to: '/donate', label: 'Donate', icon: Heart },
     ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: ShieldCheck }] : []),
   ]
   return (
@@ -83,6 +84,11 @@ export default function Layout() {
     <div className="min-h-screen md:flex">
       <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 opacity-70" style={{ backgroundImage: 'radial-gradient(rgb(var(--c-line)) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <svg viewBox="0 0 200 200" fill="none" className="absolute -left-28 -top-28 h-[58vw] w-[58vw] max-h-[620px] max-w-[620px] text-accent/[0.08]" style={{ transform: 'rotate(-6deg)' }}>
+          <path d="M20 8 H146 L182 44 V192 H20 Z" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M146 8 V44 H182" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M40 76 H140 M40 102 H140 M40 128 H108" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
         <span className="absolute -bottom-12 -right-6 select-none whitespace-nowrap font-mono text-[34vw] font-bold leading-none tracking-tighter text-ink/5 sm:text-[26vw] lg:text-[18vw]">ATR</span>
       </div>
       <aside className="relative z-10 hidden shrink-0 border-r border-line bg-panel md:block" style={{ width: sideW, transition: dragging.current ? 'none' : 'width 150ms' }}>
