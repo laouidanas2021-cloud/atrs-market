@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-const NAME = "ATR'S MARKET"
+const NAME = "ATR"
 const EM = import.meta.env.VITE_CONTACT_EMAIL || 'support@example.com'
 type P = { title: string; intro: string; s: [string, string][] }
 const PAGES: Record<string, P> = {

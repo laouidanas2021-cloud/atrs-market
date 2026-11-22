@@ -10,7 +10,7 @@ export default function Donate() {
   return (
     <div className="mx-auto max-w-lg">
       <div className="mb-6 flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-lg bg-accent/15 text-accent"><Heart className="h-5 w-5" /></span>
-        <div><h1 className="text-xl font-semibold">Support ATR'S MARKET</h1><p className="text-sm text-mute">Donations help us keep the servers running and add new products.</p></div></div>
+        <div><h1 className="text-xl font-semibold">Support ATR</h1><p className="text-sm text-mute">Donations help us keep the servers running and add new products.</p></div></div>
       <div className="card space-y-5 p-6">
         <div><label className="label">Choose an amount</label>
           <div className="grid grid-cols-4 gap-2">{PRESETS.map(v => (

@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${Deno.env.get("PADDLE_API_KEY")}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         items: [{ quantity: 1, price: {
-          description: "Donation to ATR'S MARKET", name: "Donation",
+          description: "Donation to ATR", name: "Donation",
           unit_price: { amount: String(amount), currency_code: "USD" },
           product: { name: "Donation", tax_category: "standard" } } }],
         custom_data: { kind: "donation", purchase_id: donationId, user_id: user.id },

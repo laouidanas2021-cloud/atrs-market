@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { money, size, supabase } from '../lib/supabase'
+import { X } from 'lucide-react'
+import { img, money, size, supabase } from '../lib/supabase'
 const OK_FILE = /\.(zip|rar|7z|tar|gz|exe|msi|dmg|pkg|apk|deb|iso|pdf|docx?|xlsx?|pptx?|psd|fig|json|txt)$/i
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const clean = (n: string) => n.replace(/[^\w.-]/g, '_')
@@ -28,6 +29,14 @@ function Overview() {
 function Form({ cats, initial, onDone }: any) {
   const [f, setF] = useState<any>(initial ? { ...initial, price: (initial.price_cents / 100).toString() } : { name: '', description: '', category_id: '', version: '1.0.0', pricing: 'free', price: '0', currency: 'usd', system_requirements: '', changelog: '' })
   const [logo, setLogo] = useState<File | null>(null), [shots, setShots] = useState<File[]>([]), [file, setFile] = useState<File | null>(null), [busy, setBusy] = useState(false), [err, setErr] = useState('')
+  const [existingShots, setExistingShots] = useState<any[]>([])
+  useEffect(() => { if (initial?.id) supabase.from('product_images').select('*').eq('product_id', initial.id).order('sort_order').then(r => setExistingShots(r.data || [])) }, [initial?.id])
+  async function removeShot(s: any) {
+    if (!confirm('Remove this screenshot?')) return
+    await supabase.storage.from('product-images').remove([s.path])
+    await supabase.from('product_images').delete().eq('id', s.id)
+    setExistingShots(prev => prev.filter(x => x.id !== s.id))
+  }
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value })
   async function save(e: any) {
     e.preventDefault(); setErr('')
@@ -42,7 +51,8 @@ function Form({ cats, initial, onDone }: any) {
       if (logo) row.logo_url = await up('product-images', `${id}/logo-${Date.now()}-${clean(logo.name)}`, logo)
       const q = initial ? supabase.from('products').update(row).eq('id', id) : supabase.from('products').insert({ ...row, id, slug: slugify(f.name) + '-' + id.slice(0, 4) })
       const { error } = await q; if (error) throw error
-      for (const [i, s] of shots.entries()) { const p = await up('product-images', `${id}/shot-${Date.now()}-${i}-${clean(s.name)}`, s); await supabase.from('product_images').insert({ product_id: id, path: p, sort_order: i }) }
+      const startIdx = existingShots.length
+      for (const [i, s] of shots.entries()) { const p = await up('product-images', `${id}/shot-${Date.now()}-${i}-${clean(s.name)}`, s); await supabase.from('product_images').insert({ product_id: id, path: p, sort_order: startIdx + i }) }
       if (file) await addFile(id, file, f.version)
       onDone()
     } catch (x: any) { setErr(x.message || 'Save failed') } finally { setBusy(false) } }
@@ -56,7 +66,14 @@ function Form({ cats, initial, onDone }: any) {
     <div><label className="label">System requirements</label><textarea className="input" rows={3} value={f.system_requirements || ''} onChange={set('system_requirements')} /></div>
     <div><label className="label">Changelog</label><textarea className="input" rows={3} value={f.changelog || ''} onChange={set('changelog')} /></div>
     <div><label className="label">Logo / cover</label><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setLogo(e.target.files?.[0] || null)} className="text-sm" /></div>
-    <div><label className="label">Screenshots</label><input type="file" multiple accept="image/png,image/jpeg,image/webp" onChange={e => setShots(Array.from(e.target.files || []))} className="text-sm" /></div>
+    <div><label className="label">Screenshots</label><input type="file" multiple accept="image/png,image/jpeg,image/webp" onChange={e => setShots(Array.from(e.target.files || []))} className="text-sm" />
+      {existingShots.length > 0 && <div className="mt-2 flex flex-wrap gap-2">{existingShots.map(s => (
+        <div key={s.id} className="group relative h-16 w-24 overflow-hidden rounded-md border border-line">
+          <img src={img(s.path)} alt="" className="h-full w-full object-cover" />
+          <button type="button" onClick={() => removeShot(s)} title="Remove screenshot" aria-label="Remove screenshot"
+            className="absolute right-1 top-1 rounded bg-black/70 p-0.5 text-white opacity-0 transition group-hover:opacity-100"><X className="h-3 w-3" /></button>
+        </div>))}</div>}
+    </div>
     <div className="sm:col-span-2"><label className="label">{initial ? 'New product file (becomes the current version)' : 'Product file'}</label><input type="file" onChange={e => setFile(e.target.files?.[0] || null)} className="text-sm" /></div>
     {err && <p role="alert" className="text-sm text-red-400 sm:col-span-2">{err}</p>}
     <div className="flex gap-2 sm:col-span-2"><button className="btn" disabled={busy}>{busy ? 'Uploading…' : 'Save product'}</button><button type="button" className="btn-ghost" onClick={onDone}>Cancel</button></div></form>)

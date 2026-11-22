@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 
 const MIN_W = 208, MAX_W = 360, COLLAPSED_W = 72
-const Mark = () => <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-accent font-mono text-[13px] font-semibold tracking-tight text-white">ATR</span>
+const Mark = () => <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-accent font-mono text-sm font-semibold tracking-tight text-white">A</span>
 function Avatar({ label }: { label: string }) {
   return <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-line bg-panel2 text-xs font-medium text-ink">{(label || '?').trim().charAt(0).toUpperCase()}</span>
 }
@@ -37,7 +37,7 @@ function SidebarBody({ collapsed, onToggleCollapse, onNavigate }: { collapsed: b
   return (
     <div className="flex h-full flex-col gap-6 p-4">
       <div className="flex items-center justify-between gap-2">
-        <Link to="/" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 font-semibold tracking-tight"><Mark />{!collapsed && <span className="truncate">ATR'S MARKET</span>}</Link>
+        <Link to="/" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 font-semibold tracking-tight"><Mark />{!collapsed && <span className="truncate">ATR</span>}</Link>
         <button onClick={onToggleCollapse} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-label="Toggle sidebar width" className="hidden shrink-0 rounded-md p-1.5 text-mute transition hover:bg-panel2 hover:text-ink md:block">
           {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}</button>
       </div>
@@ -97,7 +97,7 @@ export default function Layout() {
           className="absolute inset-y-0 right-0 w-1 cursor-col-resize hover:bg-accent/40" title="Drag to resize sidebar" />}
       </aside>
       <header className="relative z-10 flex items-center justify-between border-b border-line bg-panel px-4 py-3 md:hidden">
-        <Link to="/" className="flex items-center gap-2.5 font-semibold tracking-tight"><Mark />ATR'S MARKET</Link>
+        <Link to="/" className="flex items-center gap-2.5 font-semibold tracking-tight"><Mark />ATR</Link>
         <button aria-label="Open menu" onClick={() => setOpen(true)} className="rounded-md p-2 text-mute hover:bg-panel2 hover:text-ink"><Menu className="h-5 w-5" /></button>
       </header>
       {open && (
@@ -114,7 +114,7 @@ export default function Layout() {
         </main>
         <footer className="border-t border-line px-4 py-6 text-xs text-mute md:px-8">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-            <span>© {new Date().getFullYear()} ATR'S MARKET. All rights reserved. · Built by Yassine Laouid</span>
+            <span>© {new Date().getFullYear()} ATR. All rights reserved. · Built by Yassine Laouid</span>
             <div className="flex flex-wrap gap-4">
               <Link to="/terms" className="hover:text-ink">Terms</Link>
               <Link to="/privacy" className="hover:text-ink">Privacy</Link>
